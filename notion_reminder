@@ -1,0 +1,56 @@
+import requests, datetime
+from dateutil import rrule
+
+token = 'YOUR-SECRET-NOTION-INTEGRATION-TOKEN'
+
+databaseId = 'YOUR-DATABASE-ID-HERE'
+
+start_day = '2021-09-16'
+
+headers = {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
+    "Notion-Version": "2021-05-13"
+}
+
+def get_written_number():
+    #The number of articles you have written
+    readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
+    res = requests.request("POST", readUrl, headers=headers)
+    data = res.json()
+    written_number = len(data['results'])
+    return written_number
+
+def get_should_number():
+    #The number of articles you should write
+    today = datetime.date.today()
+    origin_day = datetime.datetime.strptime(start_day,'%Y-%m-%d')
+    should_number = rrule.rrule(freq = rrule.DAILY,dtstart=origin_day,until=today).count()/10
+    return should_number
+
+def is_send():
+    written_number = get_written_number()
+    should_number = get_should_number()
+    print('The number of articles you should write is' + str(should_number))
+    print('The number of articles you have written is' + str(written_number))
+    a = should_number*10 - written_number*10
+    if a == 9 :
+        #Remind one day in advance
+        print('You can start to write a ten-day summary~')
+    elif a == 0:
+        #Remind
+        print('Congratulations, this ten-day summary has been completed!')
+    elif a == 10:
+        #Completed
+        print('Remember to make a ten-day summary: what have you done in these ten days?')
+    elif a > 10:
+        #Delayed
+        print('Lazy boy! Your ten-day summary hasn\'t been done yet, you have already delayed' + str(int((a-10))) + 'days！')
+        pass
+    elif a < 9:
+        #Completed ahead of schedule
+        print('Awsome!You completed the ten-day summary ahead of schedule!')
+    
+
+if __name__ == '__main__':
+    is_send()

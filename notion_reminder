@@ -4,6 +4,7 @@ from dateutil import rrule
 token = 'YOUR-SECRET-NOTION-INTEGRATION-TOKEN'
 
 databaseId = 'YOUR-DATABASE-ID-HERE'
+'''get it from https://developers.notion.com/docs'''
 
 start_day = '2021-09-16'
 
